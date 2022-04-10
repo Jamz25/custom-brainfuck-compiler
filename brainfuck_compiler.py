@@ -1,8 +1,23 @@
 from brainfuck_to_c import BrainF_Translator
+from custom_errors import ArgumentError, FileError, FileTypeError
 import os
 import time
+import sys
 
-brainf_string = input("Code: ")
+sys.tracebacklimit = 0
+
+if len(sys.argv) == 1:
+	raise ArgumentError("NO FILE ARGUMENT FOUND!")
+
+if not os.path.isfile(sys.argv[1]):
+	raise FileError("FILE \"" + sys.argv[1] + "\" CANNOT BE FOUND OR DOES NOT EXIST!")
+
+if sys.argv[1].split(".")[-1] != "bf":
+	raise FileTypeError("INVALID FILE EXTENSION, SHOULD BE \".bf\".")
+
+with open(sys.argv[1], "r") as file:
+	brainf_string = file.read()
+
 c_code = BrainF_Translator.translate_bf(brainf_string)
 c_filename = str(hash(time.time)) + ".c"
 with open(c_filename, "w") as c_file:
